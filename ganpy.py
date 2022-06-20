@@ -7,6 +7,8 @@ class GAN:
         self.disc          = discriminator
         self.gen           = generator
         self.epoch_counter = 0
+        self.checkDevice()
+        
         pass
 
     def checkDevice(self):
@@ -31,7 +33,7 @@ class GAN:
 
     def prepareOptimizer(self):
         self.optimizer_disc = torch.optim.Adam(self.disc.parameters(), lr=self.lr)
-        self.optimizer_gen  = torch.optim.Adam(self.gen.parameters(), lr=self.lr)
+        self.optimizer_gen  = torch.optim.Adam(self.gen.parameters(),  lr=self.lr)
 
     def stepDiscriminator(self,real_samples):
         # Data for training the discriminator
@@ -79,17 +81,19 @@ class GAN:
 
         return generated_samples.detach()
 
-    def train(self):
+    def trainStep(self):
 
-        self.checkDevice()
-        for epoch in range(self.num_epochs):
-            for n, (real_samples, mnist_labels) in enumerate(self.train_loader):
-                loss_discriminator = self.stepDiscriminator(real_samples)
-                loss_generator     = self.stepGenerator()
+        for n, (real_samples, mnist_labels) in enumerate(self.train_loader):
+            loss_discriminator = self.stepDiscriminator(real_samples)
+            loss_generator     = self.stepGenerator()
 
-                # Show loss
-                if n == self.batch_size - 1:
-                    print(f"Epoch: {self.epoch_counter} Loss D.: {loss_discriminator}")
-                    print(f"Epoch: {self.epoch_counter} Loss G.: {loss_generator}")
-            self.epoch_counter += 1        
+            # Show loss
+            # if n == self.batch_size - 1:
+            #     print(f"Epoch: {self.epoch_counter} Loss D.: {loss_discriminator}")
+            #     print(f"Epoch: {self.epoch_counter} Loss G.: {loss_generator}")
+        self.epoch_counter += 1        
                 
+        return self.generate()
+
+    def finished(self):
+        return self.epoch_counter >= self.num_epochs
