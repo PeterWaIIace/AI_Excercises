@@ -81,6 +81,18 @@ class GAN:
 
         return generated_samples.detach()
 
+    def saveDisc(self,path):
+        torch.save(self.disc.state_dict(),path)
+
+    def saveGen(self,path):
+        torch.save(self.gen.state_dict(),path)
+
+    def loadDisc(self,path):
+        self.disc.load_state_dict(torch.load(path))
+
+    def loadGen(self,path):
+        self.gen.load_state_dict(torch.load(path))
+
     def trainStep(self):
 
         for n, (real_samples, mnist_labels) in enumerate(self.train_loader):
@@ -88,9 +100,9 @@ class GAN:
             loss_generator     = self.stepGenerator()
 
             # Show loss
-            # if n == self.batch_size - 1:
-            #     print(f"Epoch: {self.epoch_counter} Loss D.: {loss_discriminator}")
-            #     print(f"Epoch: {self.epoch_counter} Loss G.: {loss_generator}")
+            if n == self.batch_size - 1:
+                print(f"Epoch: {self.epoch_counter} Loss D.: {loss_discriminator}")
+                print(f"Epoch: {self.epoch_counter} Loss G.: {loss_generator}")
         self.epoch_counter += 1        
                 
         return self.generate()
